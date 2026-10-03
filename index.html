@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#0B0D0A" />
+<title>减脂训练计划 · 遇见更好的自己</title>
+<style>
+:root{
+  --bg:#0B0D0A;
+  --bg-2:#10130E;
+  --surface:#171A14;
+  --surface-2:#1E221A;
+  --border:rgba(255,255,255,.08);
+  --border-strong:rgba(255,255,255,.14);
+  --text:#F2F4EC;
+  --muted:#9AA08F;
+  --muted-2:#6C7263;
+  --accent:#C7F24B;
+  --accent-dim:rgba(199,242,75,.14);
+  --accent-ink:#171A0E;
+  --coral:#FF6B4A;
+  --coral-dim:rgba(255,107,74,.14);
+  --amber:#F5B841;
+  --radius:18px;
+  --radius-sm:12px;
+  --shadow:0 18px 50px rgba(0,0,0,.45);
+  --maxw:560px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  letter-spacing:.2px;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+body.dragging{user-select:none;-webkit-user-select:none;cursor:grabbing;}
+#app{
+  max-width:var(--maxw);
+  margin:0 auto;
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+  padding-bottom:calc(74px + env(safe-area-inset-bottom));
+}
+.page{
+  flex:1;
+  padding:20px 18px 26px;
+  animation:fade .25s ease;
+}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tabbar{
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+  width:100%;max-width:var(--maxw);
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:rgba(13,16,12,.82);
+  backdrop-filter:saturate(160%) blur(16px);
+  -webkit-backdrop-filter:saturate(160%) blur(16px);
+  border-top:1px solid var(--border);
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  z-index:40;
+}
+.tabbar button{
+  background:none;border:none;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 2px;font-size:11px;font-weight:600;letter-spacing:.5px;
+  cursor:pointer;transition:color .18s;border-radius:12px;
+}
+.tabbar button svg{width:22px;height:22px;}
+.tabbar button.active{color:var(--accent);}
+.tabbar button.active .tab-dot{background:var(--accent);}
+.tab-dot{width:4px;height:4px;border-radius:50%;background:transparent;transition:background .18s;}
+
+/* ===== Home ===== */
+.motto{
+  display:inline-block;font-weight:800;font-size:26px;line-height:1.2;
+  letter-spacing:1px;margin-bottom:2px;
+  background:linear-gradient(100deg,var(--text) 30%,var(--accent) 110%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.motto-sub{color:var(--muted);font-size:12.5px;letter-spacing:2px;margin-bottom:18px;}
+.date-line{font-size:15px;color:var(--muted);font-weight:600;margin-bottom:20px;}
+.date-line b{color:var(--text);font-weight:700;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:6px 0 12px;}
+.section-title{font-size:17px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.section-title .kicker{width:6px;height:18px;border-radius:3px;background:var(--accent);}
+.badge{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--accent-dim);color:var(--accent);}
+.badge.coral{background:var(--coral-dim);color:var(--coral);}
+.badge.amber{background:rgba(245,184,65,.14);color:var(--amber);}
+
+.item-list{display:flex;flex-direction:column;gap:10px;}
+.item{
+  display:flex;align-items:flex-start;gap:12px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 14px 14px 14px;
+  transition:opacity .2s,background .2s,border-color .2s,transform .15s;
+}
+.item.done{background:var(--bg-2);border-color:transparent;opacity:.42;}
+.item.done .item-name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted-2);}
+.item.dragging{z-index:30;opacity:.9;box-shadow:var(--shadow);border-color:var(--accent);transform:scale(1.02);}
+.check{
+  flex:none;width:24px;height:24px;border-radius:50%;
+  border:2px solid var(--border-strong);background:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:1px;transition:all .18s;
+}
+.check svg{width:14px;height:14px;opacity:0;transform:scale(.4);transition:all .18s;}
+.item.done .check{background:var(--accent);border-color:var(--accent);}
+.item.done .check svg{opacity:1;transform:scale(1);}
+.body{flex:1;min-width:0;}
+.item-name{font-weight:700;font-size:15.5px;word-break:break-word;}
+.item-meta{margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.chip{font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:7px;background:var(--surface-2);color:var(--muted);}
+.chip.vol{color:var(--accent);background:var(--accent-dim);}
+.chip.side{color:var(--coral);background:var(--coral-dim);}
+.item-note{margin-top:6px;font-size:12.5px;color:var(--muted);line-height:1.55;word-break:break-word;}
+.actions{flex:none;display:flex;align-items:center;gap:2px;margin-top:-4px;}
+.iconbtn{
+  background:none;border:none;color:var(--muted);width:32px;height:36px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:10px;
+}
+.iconbtn:hover{color:var(--text);background:var(--surface-2);}
+.iconbtn svg{width:19px;height:19px;}
+.drag-handle{cursor:grab;touch-action:none;color:var(--muted-2);}
+.drag-handle:active{cursor:grabbing;color:var(--text);}
+.drag-handle svg{width:18px;height:18px;}
+
+.status-card{margin-top:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;}
+.status-row{display:flex;align-items:center;justify-content:space-between;}
+.status-label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:1px;}
+.status-value{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px;}
+.status-pill{width:10px;height:10px;border-radius:50%;background:var(--muted-2);}
+.status-value.unstarted .status-pill{background:var(--muted-2);}
+.status-value.inprogress .status-pill{background:var(--amber);box-shadow:0 0 0 5px rgba(245,184,65,.16);}
+.status-value.completed .status-pill{background:var(--accent);box-shadow:0 0 0 5px rgba(199,242,75,.16);}
+.progress{margin-top:12px;height:6px;border-radius:6px;background:var(--surface-2);overflow:hidden;}
+.progress>i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),#A6E94B);transition:width .35s ease;}
+.progress-num{margin-top:8px;font-size:12px;color:var(--muted);}
+.feeling{margin-top:16px;border-top:1px dashed var(--border);padding-top:14px;}
+.feeling-title{font-size:13px;font-weight:700;margin-bottom:10px;}
+.feeling-chips{display:flex;flex-wrap:wrap;gap:8px;}
+.f-chip{
+  border:1px solid var(--border-strong);background:none;color:var(--muted);
+  padding:7px 13px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;transition:all .16s;
+}
+.f-chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.feeling textarea{
+  width:100%;margin-top:12px;background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);padding:12px;font-size:14px;resize:none;
+  font-family:inherit;min-height:76px;
+}
+.feeling textarea::placeholder{color:var(--muted-2);}
+.rest-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px 20px;text-align:center;}
+.rest-card .emoji{font-size:40px;line-height:1;margin-bottom:10px;}
+.rest-card h3{font-size:17px;font-weight:800;margin-bottom:6px;}
+.rest-card p{color:var(--muted);font-size:13.5px;}
+
+/* ===== generic buttons ===== */
+.btn{
+  border:none;cursor:pointer;font-weight:800;font-size:14px;
+  border-radius:13px;padding:12px 16px;letter-spacing:.5px;transition:all .16s;
+}
+.btn.primary{background:var(--accent);color:var(--accent-ink);}
+.btn.primary:hover{filter:brightness(1.06);}
+.btn.gray{background:var(--surface-2);color:var(--text);border:1px solid var(--border);}
+.btn.gray:hover{border-color:var(--border-strong);}
+.btn.coral{background:var(--coral-dim);color:var(--coral);}
+.btn.sm{padding:8px 12px;font-size:12.5px;border-radius:11px;}
+.btn.block{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ===== Calendar ===== */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-title{font-size:19px;font-weight:800;}
+.cal-nav{display:flex;gap:6px;align-items:center;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-dow{text-align:center;font-size:11px;color:var(--muted-2);font-weight:700;padding:8px 0;letter-spacing:1px;}
+.cal-cell{
+  min-height:76px;border-radius:13px;background:var(--surface);border:1px solid var(--border);
+  padding:7px 6px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:4px;
+}
+.cal-cell.dim{opacity:.38;}
+.cal-cell.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent);}
+.cal-cell.rest{background:transparent;border-color:transparent;}
+.cal-day{font-size:12px;font-weight:700;color:var(--text);}
+.cal-cell.rest .cal-day{color:var(--muted-2);}
+.cal-cell.today .cal-day{color:var(--accent);}
+.cal-workout{text-align:left;}
+.cal-wtitle{font-size:10.5px;font-weight:800;color:var(--accent);line-height:1.3;margin-top:2px;}
+.cal-cell.done .cal-wtitle{color:var(--muted);}
+.cal-names{font-size:10px;color:var(--muted);line-height:1.45;word-break:break-all;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.cal-done-dot{position:absolute;top:6px;right:6px;color:var(--accent);}
+.cal-done-dot svg{width:14px;height:14px;}
+.cal-note{font-size:11px;color:var(--muted-2);margin-top:6px;line-height:1.5;padding:0 2px;}
+
+/* ===== Plan / Library ===== */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.card h4{font-size:14px;font-weight:800;margin-bottom:10px;}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--surface-2);border-radius:13px;padding:4px;margin-bottom:14px;}
+.seg button{border:none;background:none;color:var(--muted);padding:9px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;transition:all .16s;}
+.seg button.active{background:var(--accent);color:var(--accent-ink);}
+.row{display:flex;align-items:center;gap:10px;}
+.grow{flex:1;min-width:0;}
+.hint{font-size:12px;color:var(--muted-2);line-height:1.5;}
+input[type=number],input[type=text],input[type=password],select{
+  width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;
+  color:var(--text);padding:11px 12px;font-size:14px;font-family:inherit;
+}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);}
+label.field{display:block;font-size:12px;color:var(--muted);font-weight:600;margin:10px 0 6px;}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.wday{
+  border:1px solid var(--border-strong);background:none;color:var(--muted);
+  border-radius:11px;padding:9px 0;font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;
+}
+.wday.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+.wday small{display:block;font-size:9.5px;font-weight:600;opacity:.8;margin-top:1px;}
+.tpl-head{display:flex;align-items:center;gap:10px;}
+.tpl-head .tpl-idx{flex:none;width:30px;height:30px;border-radius:9px;background:var(--accent-dim);color:var(--accent);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.tpl-head .grow{flex:1;}
+.tpl-title{font-size:15px;font-weight:800;word-break:break-word;}
+.tpl-goal{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.tpl-items{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+.tpl-item{display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--border);border-radius:11px;padding:9px 11px;}
+.tpl-item .iname{font-size:13px;font-weight:600;word-break:break-word;}
+.tpl-item .imeta{font-size:11px;color:var(--muted);margin-top:1px;}
+.tpl-footer{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.ai-panel{border:1px dashed var(--border-strong);border-radius:var(--radius);padding:14px;margin-bottom:12px;background:var(--bg-2);}
+.lib-item{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;}
+.lib-item .ck{flex:none;width:20px;height:20px;border-radius:6px;border:2px solid var(--border-strong);cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.lib-item .ck svg{width:12px;height:12px;opacity:0;}
+.lib-item.sel .ck{background:var(--accent);border-color:var(--accent);}
+.lib-item.sel .ck svg{opacity:1;}
+.divider{height:1px;background:var(--border);margin:10px 0;}
+
+/* ===== modal / menu / toast ===== */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);z-index:60;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s;}
+.overlay.center{align-items:center;padding:20px;}
+.sheet{
+  width:100%;max-width:var(--maxw);background:var(--surface);border:1px solid var(--border);
+  border-top-left-radius:24px;border-top-right-radius:24px;padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+  max-height:90vh;overflow:auto;animation:slideup .28s ease;
+}
+.overlay.center .sheet{border-radius:24px;}
+@keyframes slideup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sheet-head h3{font-size:18px;font-weight:800;}
+.sheet-close{background:none;border:none;color:var(--muted);width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:10px;font-size:20px;}
+.field-row{display:flex;gap:10px;}
+.field-row>div{flex:1;}
+.switch-row{display:flex;align-items:center;justify-content:space-between;margin-top:12px;}
+.switch-row .lab{font-size:13px;color:var(--text);font-weight:600;}
+.switch-row .sub{font-size:11px;color:var(--muted-2);}
+.switch{position:relative;width:46px;height:26px;flex:none;}
+.switch input{display:none;}
+.switch .slider{position:absolute;inset:0;background:var(--surface-2);border:1px solid var(--border-strong);border-radius:999px;cursor:pointer;transition:.18s;}
+.switch .slider:before{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:var(--muted);left:2px;top:2px;transition:.18s;}
+.switch input:checked+.slider{background:var(--accent);border-color:var(--accent);}
+.switch input:checked+.slider:before{transform:translateX(20px);background:var(--accent-ink);}
+.menu{position:fixed;z-index:70;min-width:132px;background:var(--surface-2);border:1px solid var(--border-strong);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;animation:pop .14s ease;}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.menu button{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;color:var(--text);padding:12px 14px;font-size:14px;font-weight:600;cursor:pointer;text-align:left;}
+.menu button:hover{background:var(--surface);}
+.menu button.danger{color:var(--coral);}
+.menu button svg{width:16px;height:16px;}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--text);color:#111;font-weight:700;font-size:13px;padding:11px 18px;border-radius:999px;z-index:90;box-shadow:var(--shadow);animation:toastin .25s;max-width:90vw;text-align:center;}
+@keyframes toastin{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty .e-ico{font-size:38px;line-height:1;margin-bottom:8px;opacity:.8;}
+.add-dash{border:1.5px dashed var(--border-strong);border-radius:var(--radius);color:var(--muted);background:none;width:100%;padding:13px;font-size:13.5px;font-weight:700;cursor:pointer;transition:all .16s;}
+.add-dash:hover{border-color:var(--accent);color:var(--accent);}
+.spin{width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;display:inline-block;animation:rot .7s linear infinite;}
+@keyframes rot{to{transform:rotate(360deg)}}
+@media (min-width:600px){
+  .page{padding-top:34px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <main class="page" id="page"></main>
+  <nav class="tabbar" id="tabbar"></nav>
+</div>
+<div id="modal-root"></div>
+<div id="menu-root"></div>
+<div id="toast-root"></div>
+<input type="file" id="file-input" hidden accept=".docx,.xlsx,.csv,.tsv,.txt" />
+
+<script>
+(function(){
+'use strict';
+
+/* ============================ helpers ============================ */
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.from((r||document).querySelectorAll(s));}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function uid(){return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function pad(n){return (n<10?'0':'')+n;}
+function toYMD(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function parseYMD(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+function todayYMD(){return toYMD(new Date());}
+function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function sameDay(a,b){return toYMD(a)===toYMD(b);}
+var WD=['周日','周一','周二','周三','周四','周五','周六'];
+var WD_SHORT=['日','一','二','三','四','五','六'];
+function chineseDate(s){var d=parseYMD(s);return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+WD[d.getDay()];}
+
+/* ============================ state ============================ */
+var KEY='fitfat_plan_v1';
+var state=null;
+var currentTab='home';
+var reorderCommit=null;
+
+function cloneItem(it){return {id:it.id||uid(),name:it.name||'',sets:it.sets||'',reps:it.reps==null?'':String(it.reps),perSide:!!it.perSide,note:it.note||''};}
+
+/* ---- seed from 个人减脂训练计划.docx ---- */
+var DOC_PLAN=[
+  {title:'Day A · 上肢推 + 核心 + 有氧', goal:'胸、肩、三头肌', items:[
+    {name:'热身：开合跳 + 肩部环绕', sets:'2', reps:'', perSide:false, note:'5分钟热身'},
+    {name:'标准俯卧撑 / 下斜俯卧撑', sets:'4', reps:'12-15', perSide:false, note:'健身房可用哑铃凳垫高脚'},
+    {name:'双杠臂屈伸（健身房）/ 板凳臂屈伸（家里）', sets:'3', reps:'12', perSide:false, note:'身体前倾侧重胸肌'},
+    {name:'哑铃推举（站姿）', sets:'3', reps:'12', perSide:false, note:'核心收紧不晃腰'},
+    {name:'悬垂举腿 / 卷腹', sets:'3', reps:'15', perSide:false, note:'花小龙招牌腹训动作'},
+    {name:'平板支撑击掌', sets:'3', reps:'15', perSide:true, note:'核心稳定训练'},
+    {name:'收尾有氧：慢跑 / 爬坡走', sets:'1', reps:'', perSide:false, note:'15-20分钟 · 心率控制在130-145'}
+  ]},
+  {title:'Day B · 上肢拉 + 核心 + 有氧', goal:'背部、二头肌', items:[
+    {name:'热身：猫牛式 + 弹力带肩外旋', sets:'2', reps:'', perSide:false, note:'5分钟热身'},
+    {name:'引体向上（户外单杠）/ 高位下拉（健身房）', sets:'4', reps:'8-12', perSide:false, note:'做不到引体就用下拉代替'},
+    {name:'杠铃划船 / 哑铃单臂划船', sets:'3', reps:'12', perSide:false, note:'感受背部肌肉收缩'},
+    {name:'罗马尼亚硬拉', sets:'3', reps:'10', perSide:false, note:'轻重量找腘绳肌拉伸感'},
+    {name:'俄罗斯转体（可负重）', sets:'3', reps:'20', perSide:true, note:'侧腹训练'},
+    {name:'登山跑', sets:'3', reps:'', perSide:false, note:'每组30秒 · 下腹 + 燃脂'},
+    {name:'收尾有氧：爬楼梯 / 快走', sets:'1', reps:'', perSide:false, note:'15-20分钟 · 花小龙同款爬楼燃脂'}
+  ]},
+  {title:'Day C · 下肢 + 全身燃脂', goal:'臀腿 + HIIT', items:[
+    {name:'热身：动态拉伸（腿摆动 + 髋环绕）', sets:'2', reps:'', perSide:false, note:'5分钟热身'},
+    {name:'杠铃深蹲 / 负重深蹲（哑铃抱胸）', sets:'4', reps:'15', perSide:false, note:'控制下蹲速度'},
+    {name:'反向弓步蹲', sets:'3', reps:'10', perSide:true, note:'单侧发力更均衡'},
+    {name:'臀桥 / 臀推', sets:'3', reps:'15', perSide:false, note:'顶峰收缩1秒'},
+    {name:'HIIT循环：波比跳→高抬腿→开合跳→深蹲跳', sets:'4', reps:'', perSide:false, note:'4轮 · 每个动作40秒全力做，20秒换动作 · 轮间90秒'},
+    {name:'拉伸放松', sets:'1', reps:'', perSide:false, note:'5-10分钟 · 重点拉大腿前后侧和臀部'}
+  ]}
+];
+
+function buildLibrary(){
+  var seen={},lib=[];
+  DOC_PLAN.forEach(function(t){t.items.forEach(function(it){
+    if(!seen[it.name]){seen[it.name]=1;lib.push(cloneItem(it));}
+  });});
+  return lib;
+}
+function buildPlan(){
+  return DOC_PLAN.map(function(t){
+    return {id:uid(),title:t.title,goal:t.goal,items:t.items.map(cloneItem)};
+  });
+}
+
+function defaultState(){
+  return {
+    exercises:buildLibrary(),
+    plan:buildPlan(),
+    frequency:{mode:'weekday', weekdays:[1,3,5], intervalDays:2},
+    cursor:0,
+    scheduleDue:null,
+    days:{},
+    ai:{base:'',key:'',model:'gpt-4o-mini'}
+  };
+}
+
+function load(){
+  var s=null;
+  try{s=JSON.parse(localStorage.getItem(KEY));}catch(e){}
+  if(!s||!s.plan||!Array.isArray(s.plan)){s=defaultState();}
+  if(!s.exercises)s.exercises=[];
+  if(!s.plan)s.plan=[];
+  if(!s.frequency)s.frequency={mode:'weekday',weekdays:[1,3,5],intervalDays:2};
+  if(!s.days)s.days={};
+  if(!s.ai)s.ai={base:'',key:'',model:'gpt-4o-mini'};
+  s.frequency.weekdays=s.frequency.weekdays||[1,3,5];
+  state=s;
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+
+/* ============================ frequency ============================ */
+function matchesWeekday(d){return state.frequency.mode==='weekday' && state.frequency.weekdays.indexOf(d.getDay())>=0;}
+function firstTrainingAtOrAfter(d){
+  if(state.frequency.mode==='interval')return new Date(d);
+  var cur=new Date(d);
+  for(var i=0;i<7;i++){if(state.frequency.weekdays.indexOf(cur.getDay())>=0)return cur;cur=addDays(cur,1);}
+  return cur;
+}
+function nextTrainingDate(d){
+  if(state.frequency.mode==='interval')return addDays(d,Math.max(1,state.frequency.intervalDays||2));
+  var cur=addDays(d,1);
+  for(var i=0;i<7;i++){if(state.frequency.weekdays.indexOf(cur.getDay())>=0)return cur;cur=addDays(cur,1);}
+  return cur;
+}
+
+/* ============================ day status & reconcile ============================ */
+function dayStatus(dateStr){
+  var d=state.days[dateStr];
+  if(!d||!d.items||d.items.length===0)return 'unstarted';
+  var n=d.items.length, done=d.items.filter(function(i){return i.checked;}).length;
+  if(done===n)return 'completed';
+  if(done>0)return 'inprogress';
+  return 'unstarted';
+}
+
+function reconcile(){
+  if(!state.plan.length)return;
+  var today=new Date();today.setHours(0,0,0,0);
+  if(!state.scheduleDue){
+    state.scheduleDue=toYMD(firstTrainingAtOrAfter(today));
+    state.cursor=state.cursor||0;
+  }
+  var due=parseYMD(state.scheduleDue);
+  var guard=0;
+  while(due<today && guard<500){
+    var st=dayStatus(state.scheduleDue);
+    if(st==='unstarted'){
+      state.scheduleDue=toYMD(today); // 顺延到今天
+      due=parseYMD(state.scheduleDue);
+      save();break;
+    }else{
+      state.cursor++;
+      state.scheduleDue=toYMD(nextTrainingDate(due));
+      due=parseYMD(state.scheduleDue);
+    }
+    guard++;
+  }
+}
+
+function todayWorkout(){
+  reconcile();
+  if(!state.plan.length)return null;
+  if(state.scheduleDue===todayYMD()){
+    return {workout:state.plan[state.cursor%state.plan.length], idx:state.cursor%state.plan.length};
+  }
+  return null;
+}
+
+function ensureTodayDay(workout){
+  var t=todayYMD();
+  if(!state.days[t]){
+    state.days[t]={workoutId:workout.id,title:workout.title,items:workout.items.map(function(it){var c=cloneItem(it);c.checked=false;return c;}),feeling:'',feelNote:''};
+    save();
+  }
+  return state.days[t];
+}
+
+/* projected schedule (today -> horizon) */
+function scheduleFromTo(fromStr,toStr){
+  reconcile();
+  if(!state.plan.length)return [];
+  var out=[],d=parseYMD(state.scheduleDue),i=state.cursor;
+  var from=parseYMD(fromStr),to=parseYMD(toStr),guard=0;
+  while(d<=to&&guard<1200){
+    if(d>=from){out.push({date:toYMD(d),idx:i%state.plan.length});}
+    i++;d=nextTrainingDate(d);guard++;
+  }
+  return out;
+}
+
+/* ============================ formatting ============================ */
+function fmtMeta(it){
+  var parts=[];
+  if(it.sets!==''&&it.sets!=null)parts.push(it.sets+'组');
+  if(it.reps!==''&&it.reps!=null)parts.push(it.perSide?('每侧'+it.reps):it.reps);
+  return parts.length?parts.join(' × '):'—';
+}
+
+/* ============================ toast ============================ */
+function toast(msg){
+  var r=$('#toast-root');var t=document.createElement('div');t.className='toast';t.textContent=msg;
+  r.appendChild(t);setTimeout(function(){t.style.transition='opacity .3s';t.style.opacity='0';setTimeout(function(){t.remove();},300);},1800);
+}
+
+/* ============================ modal ============================ */
+function openSheet(html,center){
+  closeMenu();
+  var root=$('#modal-root');
+  root.innerHTML='<div class="overlay'+(center?' center':'')+'" data-close-on-outside="1"><div class="sheet">'+html+'</div></div>';
+  var ov=root.firstElementChild;
+  ov.addEventListener('click',function(e){
+    if(e.target===ov&&e.target.getAttribute('data-close-on-outside'))closeSheet();
+  });
+}
+function closeSheet(){$('#modal-root').innerHTML='';}
+
+/* ============================ menu ============================ */
+function closeMenu(){$('#menu-root').innerHTML='';}
+function openMenu(x,y,items){
+  closeMenu();
+  var root=$('#menu-root');
+  var m=document.createElement('div');m.className='menu';
+  items.forEach(function(it){
+    var b=document.createElement('button');
+    b.setAttribute('data-action',it.action);
+    if(it.data)b.setAttribute('data-id',it.data);
+    if(it.danger)b.className='danger';
+    b.innerHTML=(it.icon||'')+'<span>'+esc(it.label)+'</span>';
+    m.appendChild(b);
+  });
+  root.appendChild(m);
+  var r=m.getBoundingClientRect();
+  if(x+r.width>window.innerWidth-10)x=window.innerWidth-r.width-10;
+  if(y+r.height>window.innerHeight-10)y=window.innerHeight-r.height-10;
+  m.style.left=x+'px';m.style.top=y+'px';
+  setTimeout(function(){
+    function close(e){if(!m.contains(e.target)){closeMenu();document.removeEventListener('click',close,true);}}
+    document.addEventListener('click',close,true);
+  },0);
+}
+
+/* ============================ icons ============================ */
+var IC={
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>',
+  dots:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+  grip:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/><circle cx="9" cy="12" r="1.8"/><circle cx="15" cy="12" r="1.8"/><circle cx="9" cy="18" r="1.8"/><circle cx="15" cy="18" r="1.8"/></svg>',
+  up:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>',
+  left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  ai:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l1.9 5.1L19 9l-5.1 1.9L12 16l-1.9-5.1L5 9l5.1-1.9z"/><path d="M19 15l.9 2.4L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.6z"/></svg>',
+  upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M20 16v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4"/></svg>'
+};
+var NAV=[
+  {key:'home',label:'首页',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>'},
+  {key:'calendar',label:'日程',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>'},
+  {key:'plan',label:'清单',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h1M3 12h1M3 18h1"/></svg>'},
+  {key:'lib',label:'动作库',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5L11 4.5v15l-4.5-2zM17.5 6.5L13 4.5v15l4.5-2z"/></svg>'}
+];
+
+/* ============================ render: shell ============================ */
+function renderTabbar(){
+  $('#tabbar').innerHTML=NAV.map(function(n){
+    return '<button data-action="nav" data-tab="'+n.key+'" class="'+(currentTab===n.key?'active':'')+'">'+n.icon+'<span>'+n.label+'</span><span class="tab-dot"></span></button>';
+  }).join('');
+}
+function render(){
+  renderTabbar();
+  var p=$('#page');
+  if(currentTab==='home')renderHome(p);
+  else if(currentTab==='calendar')renderCalendar(p);
+  else if(currentTab==='plan')renderPlan(p);
+  else if(currentTab==='lib')renderLibrary(p);
+}
+
+/* ============================ HOME ============================ */
+function renderHome(p){
+  var tw=todayWorkout();
+  var t=todayYMD();
+  var day=tw?ensureTodayDay(tw.workout):null;
+  var html='';
+  html+='<div><div class="motto">遇见更好的自己</div><div class="motto-sub">MEET A BETTER SELF</div>';
+  html+='<div class="date-line">今天是 <b>'+chineseDate(t)+'</b></div>';
+
+  if(!tw){
+    html+='<div class="rest-card"><div class="emoji">🌿</div><h3>今日休息 · 无训练计划</h3><p>'+(state.plan.length?('下一次训练：'+chineseDate(state.scheduleDue)):'先去「清单」添加训练计划')+'</p></div>';
+  }else{
+    html+='<div class="section-head"><div class="section-title"><span class="kicker"></span>今日训练</div><span class="badge">'+esc(day.title||tw.workout.title)+'</span></div>';
+    html+='<div class="item-list" id="today-list">';
+    var items=day.items;
+    items.forEach(function(it,idx){
+      html+=itemHtml(it,idx,'today');
+    });
+    html+='</div>';
+    html+='<button class="add-dash" style="margin-top:12px" data-action="todayAdd">'+IC.plus+' 添加今日动作</button>';
+    // status
+    var n=items.length,done=items.filter(function(i){return i.checked;}).length;
+    var st=n===0?'unstarted':(done===n?'completed':'inprogress');
+    var label=st==='unstarted'?'未开始':(st==='inprogress'?'进行中':'已完成');
+    var pct=n?Math.round(done/n*100):0;
+    html+='<div class="status-card"><div class="status-row"><span class="status-label">当前训练状态</span><span class="status-value '+st+'"><span class="status-pill"></span>'+label+'</span></div>';
+    html+='<div class="progress"><i style="width:'+pct+'%"></i></div><div class="progress-num">已完成 '+done+' / '+n+' 项</div>';
+    if(st==='completed'){
+      var feel=day.feeling||'';
+      var feopts=['轻松','正常','稍微有难度','困难'];
+      html+='<div class="feeling"><div class="feeling-title">今日训练感想</div>';
+      html+='<div class="feeling-chips">'+feopts.map(function(f){return '<button class="f-chip'+(feel===f?' active':'')+'" data-action="setFeeling" data-val="'+f+'">'+f+'</button>';}).join('')+'</div>';
+      html+='<textarea data-action="feelNote" placeholder="可手动输入今日训练感想…">'+esc(day.feelNote||'')+'</textarea></div>';
+    }
+    html+='</div>';
+  }
+  p.innerHTML=html;
+  enableDrag($('#today-list'),commitTodayOrder);
+}
+
+function itemHtml(it,idx,scope){
+  scope=scope||'today';
+  var done=it.checked?' done':'';
+  var meta=fmtMeta(it);
+  var side=it.perSide?'<span class="chip side">左右/每侧</span>':'';
+  var vol=meta!=='—'?'<span class="chip vol">'+esc(meta)+'</span>':'';
+  var check=(scope==='today')?'<button class="check" data-action="toggleItem" data-id="'+it.id+'" aria-label="完成">'+IC.check+'</button>':'<span class="check" style="cursor:default;border-style:dashed;opacity:.35">'+(idx+1)+'</span>';
+  var kebab=scope==='today'?'itemMore':'tpItemMore';
+  return '<div class="item'+done+'" data-id="'+it.id+'" data-idx="'+idx+'">'
+    +check
+    +'<div class="body"><div class="item-name">'+esc(it.name||'（未命名动作）')+'</div>'
+    +'<div class="item-meta">'+vol+side+'</div>'
+    +(it.note?'<div class="item-note">'+esc(it.note)+'</div>':'')
+    +'</div>'
+    +'<div class="actions">'
+    +'<button class="iconbtn kebab" data-action="'+kebab+'" data-id="'+it.id+'" aria-label="更多">'+IC.dots+'</button>'
+    +'<button class="iconbtn drag-handle" data-action="drag" data-id="'+it.id+'" aria-label="拖动排序">'+IC.grip+'</button>'
+    +'</div></div>';
+}
+
+/* ============================ CALENDAR ============================ */
+var calMonth=null;
+function renderCalendar(p){
+  if(!calMonth){var now=new Date();calMonth={y:now.getFullYear(),m:now.getMonth()};}
+  var y=calMonth.y,m=calMonth.m;
+  var first=new Date(y,m,1);
+  var startOffset=first.getDay();
+  var daysInMonth=new Date(y,m+1,0).getDate();
+  var monthStart=toYMD(new Date(y,m,1));
+  var monthEnd=toYMD(new Date(y,m,daysInMonth));
+  var futMap={};
+  scheduleFromTo(monthStart,monthEnd).forEach(function(s){futMap[s.date]=s.idx;});
+  var today=todayYMD();
+
+  var cells=[];
+  for(var i=0;i<startOffset;i++)cells.push('<div class="cal-cell rest"></div>');
+  for(var d=1;d<=daysInMonth;d++){
+    var date=new Date(y,m,d);var key=toYMD(date);
+    var cls='cal-cell';if(key===today)cls+=' today';
+    var isFuture=key>=today;
+    var body='';
+    var workoutIdx=(isFuture&&futMap[key]!=null)?futMap[key]:null;
+    var wname='';
+    if(isFuture&&workoutIdx!=null){
+      var w=state.plan[workoutIdx];
+      cls+=' has-work';
+      wname=w?w.title:'';
+      var names=w&&w.items?w.items.map(function(it){return it.name;}):[];
+      body='<div class="cal-workout"><div class="cal-wtitle">'+esc(w.shortTitle||shortTitle(w.title))+'</div><div class="cal-names">'+esc(names.join(' · '))+'</div></div>';
+    }else if(!isFuture){
+      // past: from days record
+      var rec=state.days[key];
+      if(rec&&rec.items&&rec.items.length){
+        var st=dayStatus(key);
+        cls+= st==='completed'?' done':'';
+        var names=rec.items.map(function(it){return it.name;});
+        body='<div class="cal-workout"><div class="cal-wtitle">'+esc(shortTitle(rec.title||''))+'</div><div class="cal-names">'+esc(names.join(' · '))+'</div></div>';
+        if(st==='completed')body+='<span class="cal-done-dot">'+IC.check+'</span>';
+      }else{
+        cls+=' rest';
+      }
+    }else{
+      cls+=' rest';
+    }
+    cells.push('<div class="'+cls+'"><span class="cal-day">'+d+'</span>'+body+'</div>');
+  }
+
+  var title=y+'年'+(m+1)+'月';
+  var html='<div class="cal-head"><div class="cal-title">'+title+'</div><div class="cal-nav">'
+    +'<button class="btn gray sm" data-action="calToday">今天</button>'
+    +'<button class="btn gray sm" data-action="calPrev">'+IC.left+'</button>'
+    +'<button class="btn gray sm" data-action="calNext">'+IC.right+'</button></div></div>';
+  html+='<div class="cal-grid">'+WD_SHORT.map(function(w){return '<div class="cal-dow">'+w+'</div>';}).join('')+cells.join('')+'</div>';
+  html+='<div class="cal-note">💡 训练日按「清单」中的计划与频率自动排布；若某训练日到次日 0 点仍为「未开始」，将自动顺延，其后计划整体后移。</div>';
+  p.innerHTML=html;
+}
+
+function shortTitle(s){return String(s||'').replace(/\s*·.*$/,'').trim()||'训练日';}
+
+/* ============================ PLAN ============================ */
+function renderPlan(p){
+  var f=state.frequency;
+  var html='';
+  html+='<div class="section-head"><div class="section-title"><span class="kicker"></span>训练计划清单</div><span class="badge">'+state.plan.length+' 个训练日</span></div>';
+
+  // frequency
+  html+='<div class="card"><h4>训练频率</h4>';
+  html+='<div class="seg"><button class="'+(f.mode==='interval'?'active':'')+'" data-action="freqMode" data-val="interval">天数间隔</button><button class="'+(f.mode==='weekday'?'active':'')+'" data-action="freqMode" data-val="weekday">自定义星期几</button></div>';
+  if(f.mode==='interval'){
+    html+='<div class="row"><span class="hint">每隔</span><div style="width:80px"><input type="number" min="1" max="30" value="'+f.intervalDays+'" data-action="intervalDays"></div><span class="hint">天训练一次</span></div>';
+  }else{
+    html+='<div class="week">'+WD_SHORT.map(function(w,i){return '<button class="wday'+(f.weekdays.indexOf(i)>=0?' active':'')+'" data-action="weekdayToggle" data-val="'+i+'">'+w+'<small>周'+w+'</small></button>';}).join('')+'</div>';
+    html+='<div class="hint" style="margin-top:10px">已选 '+(f.weekdays&&f.weekdays.length?f.weekdays.length:0)+' 天/周</div>';
+  }
+  html+='</div>';
+
+  // AI
+  html+='<div class="ai-panel"><div style="display:flex;justify-content:space-between;align-items:center"><h4 style="margin:0">AI 智能生成计划</h4><button class="btn gray sm" data-action="aiSettings">设置</button></div>';
+  html+='<p class="hint" style="margin:8px 0 12px">基于「动作库」+ 训练频率，自动编排每日训练清单。'+(state.ai.key?'（已配置 AI 模型）':'（未配置模型时使用内置智能编排）')+'</p>';
+  html+='<button class="btn primary block" data-action="aiGenerate">'+IC.ai+' 生成计划清单</button></div>';
+
+  // import
+  html+='<div class="card"><h4>导入文档 / 表格</h4><p class="hint" style="margin-bottom:12px">上传含动作的 .docx / .xlsx / .csv 表格，自动录入「动作库」并融入训练计划。</p><button class="btn gray block" data-action="importOpen">'+IC.upload+' 导入文档 / 表格</button></div>';
+
+  // templates
+  html+='<div style="margin:16px 0 8px;display:flex;align-items:center;justify-content:space-between"><span style="font-weight:800">训练日模板</span><button class="btn primary sm" data-action="addTemplate">'+IC.plus+' 新增训练日</button></div>';
+  if(!state.plan.length){
+    html+='<div class="card empty"><div class="e-ico">📋</div><p>还没有训练计划，点击上方「AI 生成」或「新增训练日」。</p></div>';
+  }else{
+    state.plan.forEach(function(tp,idx){
+      html+='<div class="card"><div class="tpl-head"><div class="tpl-idx">'+(idx+1)+'</div><div class="grow"><div class="tpl-title">'+esc(tp.title||('训练日 '+(idx+1)))+'</div><div class="tpl-goal">'+esc(tp.goal||'')+' · '+(tp.items?tp.items.length:0)+' 个动作</div></div><button class="iconbtn" data-action="tmplUp" data-id="'+tp.id+'">'+IC.up+'</button><button class="iconbtn" data-action="tmplDown" data-id="'+tp.id+'">'+IC.down+'</button></div>';
+      html+='<div class="tpl-items">'+(tp.items||[]).slice(0,20).map(function(it){return '<div class="tpl-item"><span style="flex:none;color:var(--muted-2)">'+IC.grip+'</span><div class="grow"><div class="iname">'+esc(it.name)+'</div><div class="imeta">'+esc(fmtMeta(it))+(it.note?' · '+esc(it.note):'')+'</div></div></div>';}).join('')+'</div>';
+      html+='<div class="tpl-footer"><button class="btn gray sm" data-action="tmplEdit" data-id="'+tp.id+'">'+IC.edit+' 编辑动作</button><button class="btn gray sm" data-action="tmplAdd" data-id="'+tp.id+'">'+IC.plus+' 添加</button><button class="btn coral sm" data-action="tmplDel" data-id="'+tp.id+'">'+IC.trash+' 删除</button></div></div>';
+    });
+  }
+  p.innerHTML=html;
+}
+
+/* ============================ LIBRARY ============================ */
+function renderLibrary(p){
+  var html='<div class="section-head"><div class="section-title"><span class="kicker"></span>项目 / 动作库</div><span class="badge">'+state.exercises.length+' 项</span></div>';
+  html+='<p class="hint" style="margin-bottom:14px">所有动作的母库；导入文档/表格会自动录入于此，AI 生成计划也从这里取材。</p>';
+  html+='<button class="btn primary block" style="margin-bottom:14px" data-action="addExercise">'+IC.plus+' 新增动作</button>';
+  if(!state.exercises.length){
+    html+='<div class="card empty"><div class="e-ico">🏋️</div><p>动作库为空，点击「新增动作」或到「清单」导入文档。</p></div>';
+  }else{
+    state.exercises.forEach(function(ex){
+      html+='<div class="card lib-item"><div class="body"><div class="item-name">'+esc(ex.name||'（未命名）')+'</div><div class="item-meta"><span class="chip vol">'+esc(fmtMeta(ex))+'</span>'+(ex.perSide?'<span class="chip side">左右/每侧</span>':'')+'</div>'+(ex.note?'<div class="item-note">'+esc(ex.note)+'</div>':'')+'</div><div class="actions"><button class="iconbtn" data-action="editExercise" data-id="'+ex.id+'">'+IC.edit+'</button><button class="iconbtn" data-action="delExercise" data-id="'+ex.id+'" style="color:var(--coral)">'+IC.trash+'</button></div></div>';
+    });
+  }
+  p.innerHTML=html;
+}
+
+/* ============================ item editor modal ============================ */
+function openItemEditor(title,item,onSave,extraHtml){
+  item=item||{name:'',sets:'',reps:'',perSide:false,note:''};
+  var html='<div class="sheet-head"><h3>'+esc(title)+'</h3><button class="sheet-close" data-action="closeSheet">✕</button></div>';
+  html+='<label class="field">项目 / 动作名称</label><input type="text" id="f-name" placeholder="例如：跑步、波比跳、仰卧起坐、蛙跳" value="'+esc(item.name||'')+'">';
+  html+='<div class="field-row"><div><label class="field">组数</label><input type="text" id="f-sets" inputmode="numeric" placeholder="如 3" value="'+esc(item.sets||'')+'"></div><div><label class="field">每组数量</label><input type="text" id="f-reps" placeholder="如 15 或 12-15" value="'+esc(item.reps||'')+'"></div></div>';
+  html+='<div class="switch-row"><div><div class="lab">记录左右 / 每侧</div><div class="sub">开启后显示「每侧 X」</div></div><label class="switch"><input type="checkbox" id="f-perSide" '+(item.perSide?'checked':'')+'><span class="slider"></span></label></div>';
+  html+='<label class="field">备注（动作要领）</label><textarea id="f-note" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);padding:12px;font-size:14px;font-family:inherit;resize:none;min-height:70px" placeholder="写项目动作要领…">'+esc(item.note||'')+'</textarea>';
+  if(extraHtml)html+=extraHtml;
+  html+='<button class="btn primary block" style="margin-top:16px" data-action="saveItem">保存</button>';
+  openSheet(html,true);
+  window.__itemOnSave=onSave;
+}
+
+/* ============================ template editor modal ============================ */
+function openTemplateEditor(tp){
+  var html='<div class="sheet-head"><h3>编辑训练日</h3><button class="sheet-close" data-action="closeSheet">✕</button></div>';
+  html+='<label class="field">训练日名称</label><input type="text" id="tp-title" value="'+esc(tp.title||'')+'">';
+  html+='<label class="field">训练内容</label><div class="item-list" id="tp-items">';
+  (tp.items||[]).forEach(function(it,idx){html+=itemHtml(it,idx,'tp');});
+  html+='</div>';
+  html+='<button class="add-dash" style="margin-top:12px" data-action="tpPick">'+IC.plus+' 从动作库添加</button>';
+  html+='<button class="btn primary block" style="margin-top:16px" data-action="saveTemplate">保存训练日</button>';
+  openSheet(html,false);
+  window.__tpEditId=tp.id;
+  enableDrag($('#tp-items'));
+}
+
+function refreshTemplateEditor(){
+  var tid=window.__tpEditId;var tp=state.plan.find(function(x){return x.id===tid;});if(tp)openTemplateEditor(tp);
+}
+
+function openLibPicker(targetTpId,multi){
+  var html='<div class="sheet-head"><h3>选择动作</h3><button class="sheet-close" data-action="closeSheet">✕</button></div>';
+  html+='<p class="hint" style="margin-bottom:12px">点击选择要加入的动作</p><div id="pick-list">';
+  state.exercises.forEach(function(ex){
+    html+='<div class="tpl-item lib-item" data-action="pickToggle" data-id="'+ex.id+'"><span class="ck">'+IC.check+'</span><div class="grow"><div class="iname">'+esc(ex.name)+'</div><div class="imeta">'+esc(fmtMeta(ex))+'</div></div></div>';
+  });
+  html+='</div>';
+  if(!state.exercises.length)html+='<div class="empty"><p>动作库为空</p></div>';
+  html+='<button class="btn primary block" style="margin-top:14px" data-action="pickConfirm">加入所选（<span id="pick-count">0</span>）</button>';
+  openSheet(html,false);
+  window.__pickSet={};
+  window.__pickForToday=null;
+  window.__pickTarget=targetTpId;
+}
+
+/* ============================ AI ============================ */
+function builtinGenerate(){
+  var lib=state.exercises.filter(function(e){return e.name;});
+  if(!lib.length){toast('动作库为空，请先添加动作或导入文档');return null;}
+  var f=state.frequency;
+  var k=f.mode==='weekday'?Math.max(1,f.weekdays.length):Math.max(1,f.intervalDays||2);
+  function cat(e){var n=e.name||'';if(/热身|拉伸|动态|肩部环绕|猫牛/.test(n))return 'warm';if(/有氧|跑|爬|HIIT|波比|高抬腿|开合跳|登山|快走|楼梯|跳/.test(n))return 'cardio';if(/腹|核心|卷腹|举腿|转体|平板|俄罗斯|侧腹/.test(n))return 'core';return 'strength';}
+  var warm=lib.filter(function(e){return cat(e)==='warm';});
+  var cardio=lib.filter(function(e){return cat(e)==='cardio';});
+  var core=lib.filter(function(e){return cat(e)==='core';});
+  var strength=lib.filter(function(e){return cat(e)==='strength';});
+  var plan=[];
+  for(var i=0;i<k;i++){
+    var items=[];
+    if(warm.length)items.push(cloneItem(warm[i%warm.length]));
+    for(var j=i;j<strength.length;j+=k)items.push(cloneItem(strength[j]));
+    if(core.length)items.push(cloneItem(core[i%core.length]));
+    if(cardio.length)items.push(cloneItem(cardio[i%cardio.length]));
+    if(items.length)plan.push({id:uid(),title:'第 '+(i+1)+' 天 · 训练日',goal:'自动编排',items:items});
+  }
+  return plan;
+}
+
+function aiGenerate(){
+  var btn=$('[data-action=aiGenerate]');
+  if(!state.exercises.length){toast('动作库为空');return;}
+  if(state.ai.key&&state.ai.base){
+    if(btn){btn.innerHTML='<span class="spin"></span> 生成中…';btn.disabled=true;}
+    var freq=state.frequency;
+    var payload={model:state.ai.model,messages:[
+      {role:'system',content:'你是专业健身教练。根据给定的动作库 JSON 与训练频率，编排训练计划清单。只输出 JSON 数组，元素格式：{"title":"训练日名称","goal":"目标","items":[{"name":"动作名","sets":"组数","reps":"每组数量","perSide":false,"note":"动作要领"}]}。不要输出任何解释。'},
+      {role:'user',content:'动作库：'+JSON.stringify(state.exercises)+'\n训练频率：'+JSON.stringify(freq)}
+    ],temperature:0.6};
+    fetch(state.ai.base.replace(/\/$/,'')+'/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.ai.key},
+      body:JSON.stringify(payload)
+    }).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(function(j){
+      var txt=j.choices&&j.choices[0]&&j.choices[0].message?j.choices[0].message.content:'';
+      var arr=parseAIJson(txt);
+      if(arr&&arr.length){applyPlanFromAI(arr);toast('AI 已生成 '+arr.length+' 个训练日');}
+      else throw new Error('parse');
+    }).catch(function(e){
+      var plan=builtinGenerate();if(plan){state.plan=plan;state.cursor=0;state.scheduleDue=null;save();render();toast('AI 未接通，已使用内置智能编排');}
+    }).finally(function(){if(btn){btn.innerHTML=IC.ai+' 生成计划清单';btn.disabled=false;}});
+  }else{
+    var plan=builtinGenerate();if(plan){state.plan=plan;state.cursor=0;state.scheduleDue=null;save();render();toast('已按动作库 + 频率生成计划');}
+  }
+}
+function parseAIJson(txt){
+  txt=String(txt||'').trim();
+  var i=txt.indexOf('['),j=txt.lastIndexOf(']');
+  if(i>=0&&j>i)txt=txt.slice(i,j+1);
+  try{return JSON.parse(txt);}catch(e){return null;}
+}
+function applyPlanFromAI(arr){
+  function norm(it){return {id:uid(),name:String(it.name||''),sets:it.sets==null?'':String(it.sets),reps:it.reps==null?'':String(it.reps),perSide:!!it.perSide,note:String(it.note||'')};}
+  state.plan=arr.filter(function(t){return t&&(t.items||t.title);}).map(function(t,idx){
+    return {id:uid(),title:String(t.title||('训练日 '+(idx+1))),goal:String(t.goal||''),items:(t.items||[]).map(norm)};
+  });
+  if(!state.plan.length){state.plan=builtinGenerate()||[];}
+  state.cursor=0;state.scheduleDue=null;save();render();
+}
+
+/* ============================ import ============================ */
+function openAI_settings(){
+  var html='<div class="sheet-head"><h3>AI 模型设置</h3><button class="sheet-close" data-action="closeSheet">✕</button></div>';
+  html+='<p class="hint" style="margin-bottom:12px">填入 OpenAI 兼容接口（可留空，使用内置智能编排）。</p>';
+  html+='<label class="field">接口地址 Base URL</label><input type="text" id="ai-base" placeholder="https://api.openai.com/v1" value="'+esc(state.ai.base||'')+'">';
+  html+='<label class="field">API Key</label><input type="password" id="ai-key" placeholder="sk-…" value="'+esc(state.ai.key||'')+'">';
+  html+='<label class="field">模型</label><input type="text" id="ai-model" placeholder="gpt-4o-mini" value="'+esc(state.ai.model||'')+'">';
+  html+='<button class="btn primary block" style="margin-top:16px" data-action="saveAI">保存</button>';
+  openSheet(html,true);
+}
+
+function importMappedRows(rows){
+  // rows: array of plain object {name,sets,reps,perSide,note}
+  var items=rows.filter(function(r){return r&&r.name;}).map(function(r){
+    return {id:uid(),name:String(r.name),sets:r.sets==null?'':String(r.sets),reps:r.reps==null?'':String(r.reps),perSide:!!r.perSide,note:String(r.note||'')};
+  });
+  if(!items.length){toast('未识别到有效动作数据');return;}
+  // add to library (dedupe by name)
+  items.forEach(function(it){
+    var exists=state.exercises.some(function(e){return e.name===it.name;});
+    if(!exists)state.exercises.push(cloneItem(it));
+  });
+  // add as a new template
+  state.plan.push({id:uid(),title:'导入 · '+(new Date().getMonth()+1)+'月'+(new Date().getDate())+'日',goal:'文档/表格导入',items:items});
+  state.cursor=0;state.scheduleDue=null;
+  save();render();
+  toast('已导入 '+items.length+' 个动作');
+}
+
+function matchField(h){
+  if(!h)return null;
+  var s=String(h).trim().toLowerCase();
+  if(/动作|项目|名称|训练内容|exercis|movement|action|item|name|动作名称/.test(s))return 'name';
+  if(/组数|sets|set|组/.test(s)&&!/次数|次|reps|rep/.test(s))return 'sets';
+  if(/次数|每组|数量|reps|rep|次/.test(s)&&!/组数/.test(s))return 'reps';
+  if(/备注|说明|要领|注意|提示|note|remark|comment|tips/.test(s))return 'note';
+  if(/左右|每侧|单侧|side|left|right/.test(s))return 'perSide';
+  return null;
+}
+function parseSetRepsCell(cell){
+  // handles "4组×12-15次" / "3组×每侧20次" / "15-20分钟" / "4轮"
+  var t=String(cell||'').trim();
+  var sets='',reps='',perSide=/每侧|左右|each side|per side/i.test(t);
+  var ms=t.match(/(\d+)\s*组/);if(ms)sets=ms[1];
+  var mr=t.match(/(\d+(?:-\d+)?)\s*次/);if(mr)reps=mr[1];
+  if(/\d+\s*轮/.test(t)&&!ms)sets=t.match(/(\d+)\s*轮/)[1];
+  return {sets:sets,reps:reps,perSide:perSide};
+}
+
+function handleCSV(text){
+  var lines=String(text||'').split(/\r?\n/).filter(function(l){return l.trim()!=='';});
+  if(!lines.length){toast('文件为空');return;}
+  var delim=lines[0].indexOf('\t')>=0?'\t':(lines[0].indexOf(',')>=0?',':'\t');
+  function split(l){var out=[],cur='',q=false;for(var i=0;i<l.length;i++){var c=l[i];if(q){if(c==='"')q=false;else cur+=c;}else{if(c==='"')q=true;else if(c===delim){out.push(cur.trim());cur='';}else cur+=c;}}out.push(cur.trim());return out;}
+  var header=split(lines[0]);
+  var colMap={};header.forEach(function(h,i){var f=matchField(h);if(f&&colMap[f]==null)colMap[f]=i;});
+  var rows=lines.slice(1).map(function(l){
+    var cells=split(l);
+    if(!colMap.name&&colMap.name!==0){// assume order name,sets,reps,note
+      return {name:cells[0],sets:cells[1],reps:cells[2],note:cells.slice(3).join(' ')};
+    }
+    var r={name:cells[colMap.name],sets:colMap.sets!=null?cells[colMap.sets]:'',reps:colMap.reps!=null?cells[colMap.reps]:'',perSide:colMap.perSide!=null?/每侧|左右|是|true|1/.test(cells[colMap.perSide]):false,note:colMap.note!=null?cells[colMap.note]:''};
+    if((colMap.sets==null||colMap.reps==null)&&r.name){
+      // maybe combined column
+    }
+    return r;
+  });
+  importMappedRows(rows);
+}
+
+function handleXLSX(arrayBuffer){
+  if(typeof XLSX==='undefined'){toast('未加载解析库，请联网后重试');return;}
+  var wb=XLSX.read(arrayBuffer,{type:'array'});
+  var ws=wb.Sheets[wb.SheetNames[0]];
+  var aoa=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});
+  if(!aoa.length)return;
+  var header=aoa[0].map(function(h){return String(h);});
+  var colMap={};header.forEach(function(h,i){var f=matchField(h);if(f&&colMap[f]==null)colMap[f]=i;});
+  var rows=aoa.slice(1).map(function(cells){
+    var r={name:colMap.name!=null?cells[colMap.name]:cells[0],sets:colMap.sets!=null?cells[colMap.sets]:'',reps:colMap.reps!=null?cells[colMap.reps]:'',perSide:colMap.perSide!=null?/每侧|左右|是|true|1/.test(String(cells[colMap.perSide])):false,note:colMap.note!=null?cells[colMap.note]:''};
+    // if a combined column of sets x reps exists in sets/name? skip
+    if((colMap.sets==null||colMap.reps==null)){
+      var combo=header.map(function(h,i){return {h:h,i:i};}).find(function(o){return /组数.*次数|次数.*组数/.test(o.h);});
+      if(combo){var p=parseSetRepsCell(cells[combo.i]);r.sets=p.sets;r.reps=p.reps;r.perSide=p.perSide||r.perSide;}
+    }
+    return r;
+  });
+  importMappedRows(rows);
+}
+
+function handleDOCX(arrayBuffer){
+  if(typeof JSZip==='undefined'){toast('未加载解析库，请联网后重试');return;}
+  JSZip.loadAsync(arrayBuffer).then(function(zip){
+    var f=zip.file('word/document.xml');
+    if(!f)return Promise.reject('no xml');
+    return f.async('string');
+  }).then(function(xml){
+    var doc=new DOMParser().parseFromString(xml,'application/xml');
+    var rows=extractDocxTables(doc);
+    importMappedRows(rows);
+  }).catch(function(e){toast('解析 Word 失败：'+e.message);});
+}
+
+function extractDocxTables(doc){
+  var rows=[];
+  var tables=doc.getElementsByTagName('w:tbl');
+  Array.from(tables).forEach(function(tbl){
+    var trs=Array.from(tbl.getElementsByTagName('w:tr'));
+    var header=null;
+    trs.forEach(function(tr,ri){
+      var cells=Array.from(tr.getElementsByTagName('w:tc')).map(function(tc){
+        return Array.from(tc.getElementsByTagName('w:t')).map(function(t){return t.textContent;}).join('');
+      });
+      if(ri===0){
+        header=cells; // try detect
+        if(!header.some(function(h){return matchField(h);})){// first row is data, treat header generic
+          addRowFromCells(cells,['name','sets','reps','note'],rows);
+          header=null;
+        }
+        return;
+      }
+      if(!header)return;
+      var r={name:'',sets:'',reps:'',perSide:false,note:''};
+      header.forEach(function(h,i){var f=matchField(h);if(f){var v=cells[i]||'';if(f==='name')r.name=v;else if(f==='sets')r.sets=v;else if(f==='reps')r.reps=v;else if(f==='perSide')r.perSide=/每侧|左右|是|true|1/.test(v);else if(f==='note')r.note=v;}});
+      // combined 组数×次数 column
+      if((!r.sets||!r.reps)){
+        var ci=header.findIndex(function(h){return /组数.*次数|次数.*组数|x|×/.test(String(h));});
+        if(ci>=0){var p=parseSetRepsCell(cells[ci]);if(p.sets)r.sets=p.sets;if(p.reps)r.reps=p.reps;if(p.perSide)r.perSide=true;}
+      }
+      // fallback: first col name
+      if(!r.name)r.name=cells[0];
+      if(r.name)rows.push(r);
+    });
+  });
+  if(!rows.length){
+    // no tables -> treat as flat maybe use paragraphs
+    var ps=Array.from(doc.getElementsByTagName('w:p')).map(function(p){return p.textContent.trim();}).filter(Boolean);
+    if(ps.length){rows.push({name:ps[0],sets:'',reps:'',perSide:false,note:ps.slice(1,3).join(' ')||''});}
+  }
+  return rows;
+}
+function addRowFromCells(cells,map,rows){
+  var r={name:'',sets:'',reps:'',perSide:false,note:''};
+  cells.forEach(function(v,i){var f=map[i];if(f==='name')r.name=v;else if(f==='sets')r.sets=v;else if(f==='reps')r.reps=v;else if(f==='note')r.note=v;});
+  if(r.name)rows.push(r);
+}
+
+function loadCDN(src,cb,err){
+  var s=document.createElement('script');s.src=src;s.onload=cb;s.onerror=err||function(){toast('脚本加载失败');};
+  document.head.appendChild(s);
+}
+function importFile(file){
+  var ext=(file.name.split('.').pop()||'').toLowerCase();
+  var reader=new FileReader();
+  if(ext==='csv'||ext==='tsv'||ext==='txt'){
+    reader.onload=function(){handleCSV(reader.result);};
+    reader.readAsText(file,'utf-8');
+  }else if(ext==='xlsx'){
+    reader.onload=function(){
+      if(typeof XLSX!=='undefined'){handleXLSX(reader.result);return;}
+      loadCDN('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js',function(){handleXLSX(reader.result);});
+    };
+    reader.readAsArrayBuffer(file);
+  }else if(ext==='docx'){
+    reader.onload=function(){
+      if(typeof JSZip!=='undefined'){handleDOCX(reader.result);return;}
+      loadCDN('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',function(){handleDOCX(reader.result);});
+    };
+    reader.readAsArrayBuffer(file);
+  }else{
+    toast('仅支持 .docx / .xlsx / .csv');
+  }
+}
+
+/* ============================ drag reorder ============================ */
+var dragTimer=null,dragInfo=null;
+function enableDrag(container,commit){
+  if(!container)return;
+  $$('.drag-handle',container).forEach(function(handle){
+    handle.addEventListener('pointerdown',function(e){
+      e.preventDefault();
+      var item=handle.closest('.item');
+      if(!item)return;
+      clearTimeout(dragTimer);
+      dragTimer=setTimeout(function(){
+        dragInfo={container:container,item:item,commit:commit};
+        item.classList.add('dragging');
+        document.body.classList.add('dragging');
+        if(navigator.vibrate)navigator.vibrate(25);
+        handle.setPointerCapture&&handle.setPointerCapture(e.pointerId);
+      },380);
+    });
+    handle.addEventListener('pointermove',function(e){
+      if(!dragInfo)return;
+      e.preventDefault();
+      moveDrag(e.clientY);
+    });
+    handle.addEventListener('pointerup',function(e){
+      clearTimeout(dragTimer);
+      if(dragInfo){finishDrag();}
+    });
+    handle.addEventListener('pointercancel',function(){clearTimeout(dragTimer);if(dragInfo)finishDrag();});
+  });
+}
+function moveDrag(y){
+  var container=dragInfo.container,item=dragInfo.item;
+  var others=$$('.item',container).filter(function(c){return c!==item;});
+  var ref=null;
+  for(var i=0;i<others.length;i++){
+    var r=others[i].getBoundingClientRect();
+    if(y<r.top+r.height/2){ref=others[i];break;}
+  }
+  if(ref)container.insertBefore(item,ref);
+  else container.appendChild(item);
+}
+function finishDrag(){
+  var info=dragInfo;dragInfo=null;
+  if(!info)return;
+  var item=info.item;(item?item.classList:null)&&item.classList.remove('dragging');
+  document.body.classList.remove('dragging');
+  var order=Array.from(info.container.children).map(function(el){return el.getAttribute('data-id');});
+  if(typeof info.commit==='function')info.commit(order);
+}
+function commitTodayOrder(order){
+  var t=todayYMD();var d=state.days[t];if(!d)return;
+  var map={};d.items.forEach(function(it){map[it.id]=it;});
+  d.items=order.map(function(iid){return map[iid];}).filter(Boolean);
+  save();
+}
+
+/* ============================ actions ============================ */
+function setTab(t){currentTab=t;closeMenu();closeSheet();render();}
+
+function todayItems(){var t=todayYMD();reconcile();var tw=todayWorkout();if(!tw)return null;var d=ensureTodayDay(tw.workout);return d;}
+
+function handleClick(target){
+  var action=target.getAttribute&&target.getAttribute('data-action');
+  if(!action)return;
+  var id=target.getAttribute('data-id');
+  var val=target.getAttribute('data-val');
+  closeMenu();
+
+  if(action==='nav'){setTab(target.getAttribute('data-tab'));}
+  else if(action==='closeSheet'){closeSheet();}
+  else if(action==='toggleItem'){
+    var d=todayItems();if(!d)return;
+    var it=d.items.find(function(x){return x.id===id;});if(!it)return;
+    it.checked=!it.checked;save();
+    // refresh status area without losing scroll too much
+    render();
+  }
+  else if(action==='itemMore'){
+    var x=target.getBoundingClientRect();
+    openMenu(x.right-8,x.bottom+6,[
+      {label:'修改',action:'todayEdit',data:id,icon:IC.edit},
+      {label:'删除',action:'todayDel',data:id,icon:IC.trash,danger:true}
+    ]);
+  }
+  else if(action==='todayEdit'){
+    var d=todayItems();if(!d)return;
+    var it=d.items.find(function(x){return x.id===id;});if(!it)return;
+    openItemEditor('修改动作',it,function(nv){it.name=nv.name;it.sets=nv.sets;it.reps=nv.reps;it.perSide=nv.perSide;it.note=nv.note;save();render();});
+  }
+  else if(action==='todayDel'){
+    var d=todayItems();if(!d)return;
+    if(!confirm('删除该动作？'))return;
+    d.items=d.items.filter(function(x){return x.id!==id;});save();render();
+  }
+  else if(action==='todayAdd'){
+    var tw=todayWorkout();if(!tw)return;var d=ensureTodayDay(tw.workout);
+    openLibPickerForToday(d);
+  }
+  else if(action==='setFeeling'){
+    var d=todayItems();if(!d)return;d.feeling=d.feeling===val?'':val;save();render();
+  }
+  else if(action==='calPrev'){calMonth.m--;if(calMonth.m<0){calMonth.m=11;calMonth.y--;}render();}
+  else if(action==='calNext'){calMonth.m++;if(calMonth.m>11){calMonth.m=0;calMonth.y++;}render();}
+  else if(action==='calToday'){var n=new Date();calMonth={y:n.getFullYear(),m:n.getMonth()};render();}
+  else if(action==='freqMode'){state.frequency.mode=val;state.scheduleDue=null;save();render();}
+  else if(action==='weekdayToggle'){
+    var w=parseInt(val,10);var arr=state.frequency.weekdays;var i=arr.indexOf(w);
+    if(i>=0)arr.splice(i,1);else arr.push(w);arr.sort();
+    state.scheduleDue=null;save();render();
+  }
+  else if(action==='aiSettings'){openAI_settings();}
+  else if(action==='aiGenerate'){aiGenerate();}
+  else if(action==='addTemplate'){
+    var tp={id:uid(),title:'训练日 '+(state.plan.length+1),goal:'',items:[]};
+    state.plan.push(tp);save();openTemplateEditor(tp);
+  }
+  else if(action==='tmplEdit'){
+    var tp=state.plan.find(function(x){return x.id===id;});if(tp)openTemplateEditor(tp);
+  }
+  else if(action==='tmplAdd'){
+    openLibPicker(id,true);
+  }
+  else if(action==='tmplDel'){
+    if(!confirm('删除该训练日模板？'))return;
+    state.plan=state.plan.filter(function(x){return x.id!==id;});state.scheduleDue=null;save();render();
+  }
+  else if(action==='tmplUp'||action==='tmplDown'){
+    var idx=state.plan.findIndex(function(x){return x.id===id;});if(idx<0)return;
+    var ni=action==='tmplUp'?idx-1:idx+1;if(ni<0||ni>=state.plan.length)return;
+    var tmp=state.plan[idx];state.plan[idx]=state.plan[ni];state.plan[ni]=tmp;save();render();
+  }
+  else if(action==='tpItemMore'){
+    var x=target.getBoundingClientRect();
+    openMenu(x.right-8,x.bottom+6,[
+      {label:'修改',action:'tpEdit',data:id,icon:IC.edit},
+      {label:'删除',action:'tpDel',data:id,icon:IC.trash,danger:true}
+    ]);
+  }
+  else if(action==='tpEdit'){
+    var tidA=window.__tpEditId;var tpA=state.plan.find(function(x){return x.id===tidA;});if(!tpA)return;
+    var itA=tpA.items&&tpA.items.find(function(x){return x.id===id;});if(!itA)return;
+    openItemEditor('修改动作',itA,function(nv){itA.name=nv.name;itA.sets=nv.sets;itA.reps=nv.reps;itA.perSide=nv.perSide;itA.note=nv.note;save();render();});
+  }
+  else if(action==='tpDel'){
+    var tidB=window.__tpEditId;var tpB=state.plan.find(function(x){return x.id===tidB;});if(!tpB)return;
+    if(!confirm('删除该动作？'))return;
+    tpB.items=(tpB.items||[]).filter(function(x){return x.id!==id;});
+    save();refreshTemplateEditor();
+  }
+  else if(action==='tpPick'){var tidC=window.__tpEditId;openLibPicker(tidC,true);}
+  else if(action==='saveTemplate'){
+    var tid=window.__tpEditId;var tp=state.plan.find(function(x){return x.id===tid;});if(!tp){closeSheet();return;}
+    tp.title=$('#tp-title').value.trim()||tp.title;
+    var order=Array.from($$('#tp-items .item')).map(function(el){return el.getAttribute('data-id');});
+    var map={};tp.items.forEach(function(it){map[it.id]=it;});
+    tp.items=order.map(function(iid){return map[iid];}).filter(Boolean);
+    save();closeSheet();render();
+  }
+  else if(action==='saveItem'){
+    var nv={name:$('#f-name').value.trim(),sets:$('#f-sets').value.trim(),reps:$('#f-reps').value.trim(),perSide:$('#f-perSide').checked,note:$('#f-note').value.trim()};
+    if(!nv.name){toast('请填写动作名称');return;}
+    if(window.__itemOnSave){window.__itemOnSave(nv);window.__itemOnSave=null;}
+    closeSheet();render();
+  }
+  else if(action==='pickToggle'){
+    var el=target.closest('.lib-item');if(!el)return;
+    var eid=el.getAttribute('data-id');
+    if(window.__pickSet[eid]){delete window.__pickSet[eid];el.classList.remove('sel');}
+    else{window.__pickSet[eid]=1;el.classList.add('sel');}
+    var n=Object.keys(window.__pickSet).length;
+    var c=$('#pick-count');if(c)c.textContent=n;
+  }
+  else if(action==='pickConfirm'){
+    var ids=Object.keys(window.__pickSet||{});
+    if(!ids.length){toast('请先选择动作');return;}
+    var tid=window.__pickTarget;var tp=state.plan.find(function(x){return x.id===tid;});
+    var picked=state.exercises.filter(function(e){return ids.indexOf(e.id)>=0;}).map(function(e){return cloneItem(e);});
+    if(tp){tp.items=(tp.items||[]).concat(picked);closeSheet();render();toast('已加入 '+picked.length+' 个动作');}
+    else if(window.__pickForToday){window.__pickForToday(picked);}
+  }
+  else if(action==='pickConfirmToday'){
+    var ids2=Object.keys(window.__pickSet||{});
+    if(!ids2.length){toast('请先选择动作');return;}
+    var picked2=state.exercises.filter(function(e){return ids2.indexOf(e.id)>=0;}).map(function(e){return cloneItem(e);});
+    if(window.__pickForToday){window.__pickForToday(picked2);}
+    closeSheet();render();
+  }
+  else if(action==='addExercise'){
+    openItemEditor('新增动作',null,function(nv){state.exercises.push(cloneItem(nv));save();});
+  }
+  else if(action==='editExercise'){
+    var ex=state.exercises.find(function(x){return x.id===id;});if(!ex)return;
+    openItemEditor('修改动作',ex,function(nv){ex.name=nv.name;ex.sets=nv.sets;ex.reps=nv.reps;ex.perSide=nv.perSide;ex.note=nv.note;save();render();});
+  }
+  else if(action==='delExercise'){
+    if(!confirm('删除该动作？'))return;
+    state.exercises=state.exercises.filter(function(x){return x.id!==id;});save();render();
+  }
+  else if(action==='importOpen'){$('#file-input').click();}
+  else if(action==='saveAI'){
+    state.ai.base=$('#ai-base').value.trim();state.ai.key=$('#ai-key').value.trim();state.ai.model=$('#ai-model').value.trim()||'gpt-4o-mini';
+    save();closeSheet();render();toast('AI 设置已保存');
+  }
+}
+
+function openLibPickerForToday(day){
+  // simplified: pick from library to add to today
+  var html='<div class="sheet-head"><h3>选择动作</h3><button class="sheet-close" data-action="closeSheet">✕</button></div>';
+  html+='<div id="pick-list">';
+  state.exercises.forEach(function(ex){
+    html+='<div class="tpl-item lib-item" data-action="pickToggle" data-id="'+ex.id+'"><span class="ck">'+IC.check+'</span><div class="grow"><div class="iname">'+esc(ex.name)+'</div><div class="imeta">'+esc(fmtMeta(ex))+'</div></div></div>';
+  });
+  html+='</div>';
+  if(!state.exercises.length)html+='<div class="empty"><p>动作库为空</p></div>';
+  html+='<button class="btn primary block" style="margin-top:14px" data-action="pickConfirmToday">加入今日（<span id="pick-count">0</span>）</button>';
+  openSheet(html,false);
+  window.__pickSet={};window.__pickForToday=function(picked){
+    picked.forEach(function(p){var c=cloneItem(p);c.checked=false;day.items.push(c);});
+    save();render();
+  };
+  window.__pickTarget=null;
+}
+
+function handleChange(target){
+  var action=target.getAttribute&&target.getAttribute('data-action');
+  if(!action)return;
+  if(action==='intervalDays'){
+    var v=parseInt(target.value,10);if(!v||v<1)v=2;
+    state.frequency.intervalDays=v;state.scheduleDue=null;save();render();
+  }
+  else if(action==='feelNote'){
+    var t=todayYMD();var d=state.days[t];if(d){d.feelNote=target.value;save();}
+  }
+  else if(action==='file'){
+    var file=target.files&&target.files[0];if(file)importFile(file);target.value='';
+  }
+}
+
+/* ============================ events ============================ */
+document.addEventListener('click',function(e){
+  if(e.target.closest&&e.target.closest('[data-action]'))handleClick(e.target.closest('[data-action]'));
+});
+document.addEventListener('change',function(e){
+  if(e.target.id==='file-input'){if(e.target.files&&e.target.files[0])importFile(e.target.files[0]);e.target.value='';}
+  else if(e.target.closest&&e.target.closest('[data-action]'))handleChange(e.target.closest('[data-action]'));
+});
+document.addEventListener('pointerdown',function(e){
+  // close menu when clicking anywhere except menu/kebab
+  if(!e.target.closest('#menu-root') && !e.target.closest('[data-action=itemMore]')){closeMenu();}
+},true);
+
+/* ============================ init + timer ============================ */
+load();
+reconcile();
+if(!state.scheduleDue&&state.plan.length){state.scheduleDue=toYMD(firstTrainingAtOrAfter(new Date()));save();}
+render();
+
+var lastDate=todayYMD();
+setInterval(function(){
+  var d=todayYMD();
+  if(d!==lastDate){lastDate=d;reconcile();render();}
+},30000);
+
+})();
+</script>
+</body>
+</html>
